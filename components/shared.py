@@ -2,9 +2,8 @@ from ipyleaflet import basemaps
 
 from atlas import indices
 
-# Índices disponibles para la UI: {etiqueta legible -> clave del registro}.
-# Se deriva del registro pluggable: registrar un índice nuevo lo hace aparecer aquí.
-INDICES = indices.labels()
+# Niveles de estrés UTCI para la vista de horas anuales: {etiqueta -> idx 0..9}.
+LEVELS = {c.label: c.idx for c in indices.UTCI_STRESS}
 
 
 BASEMAPS = {

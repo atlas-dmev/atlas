@@ -1,8 +1,8 @@
 # Datos (fuera de Git — se regeneran con la ingesta)
-#data/
+data/
 
 # Zarr stores en cualquier ubicación
-#*.zarr/
+*.zarr/
 
 # Entornos / uv
 .venv/
@@ -15,3 +15,6 @@ __pycache__/
 
 # Sistema
 .DS_Store
+
+# Jupyter
+.ipynb_checkpoints/

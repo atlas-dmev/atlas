@@ -1,66 +1,39 @@
-"""Figuras de serie temporal para una celda (consumidas por la app y los demos).
+"""Figuras por celda (consumidas por la app).
 
 Mantiene el ploteo fuera de la capa Shiny: ``components.servers`` solo llama a
-``hourly_series(...)`` y devuelve la figura desde ``@render.plot``.
+``level_distribution(...)`` y devuelve la figura desde ``@render.plot``.
 """
 
 from __future__ import annotations
-
-import datetime as dt
 
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
-import xarray as xr
 
-from atlas import compute, indices
+from atlas import stac
 from atlas.indices import UTCI_STRESS
 
 
-def _shade_categories(ax, ymin: float, ymax: float) -> None:
-    """Pinta bandas horizontales tenues con los colores de las categorías de estrés."""
-    for c in UTCI_STRESS:
-        lo = max(c.lo, ymin)
-        hi = min(c.hi, ymax)
-        if lo < hi:
-            ax.axhspan(lo, hi, color=c.color, alpha=0.18, zorder=0)
-
-
-def hourly_series(
-    lat: float,
-    lon: float,
-    fecha: dt.date | str,
-    var: str = "utci",
-) -> plt.Figure:
-    """Figura de la serie horaria de ``var`` en la celda más cercana, para un día."""
-    serie: xr.DataArray = compute.series_at(lat, lon, var).sel(time=str(fecha)).load()
-    clat, clon = compute.nearest_cell(lat, lon)
-    horas = serie["time"].dt.hour.values
-    vals = serie.values
+def level_distribution(lat: float, lon: float, year: int) -> plt.Figure:
+    """Barras horizontales: horas/año en cada nivel de estrés para una celda."""
+    horas = stac.hours_at(lat, lon, year)
+    clat, clon = float(horas["lat"]), float(horas["lon"])
+    vals = horas.values
 
     fig, ax = plt.subplots(figsize=(5.2, 3.0))
-    ymin, ymax = float(np.min(vals)) - 2, float(np.max(vals)) + 2
-    _shade_categories(ax, ymin, ymax)
-    ax.plot(horas, vals, marker="o", ms=3, color="#222", zorder=3)
-
-    i_max = int(np.argmax(vals))
-    vmax = float(vals[i_max])
-    cat = indices.utci_category(vmax)
-    ax.annotate(
-        f"máx {vmax:.1f}°C\n{cat.label}",
-        (horas[i_max], vmax),
-        textcoords="offset points",
-        xytext=(6, -4),
-        fontsize=8,
-    )
-
-    ax.set_xlim(0, 23)
-    ax.set_ylim(ymin, ymax)
-    ax.set_xlabel("hora (UTC)")
-    ax.set_ylabel("UTCI (°C)")
-    ax.set_title(f"UTCI horario · celda ({clat:.2f}, {clon:.2f}) · {fecha}", fontsize=9)
+    y = np.arange(len(UTCI_STRESS))
+    ax.barh(y, vals, color=[c.color for c in UTCI_STRESS], edgecolor="#999", lw=0.5)
+    ax.set_yticks(y)
+    ax.set_yticklabels([c.label for c in UTCI_STRESS], fontsize=7)
+    ax.invert_yaxis()  # frío arriba, calor abajo: mismo orden que la escala
+    for yi, v in zip(y, vals):
+        if v > 0:
+            ax.text(v, yi, f" {int(v):,}", va="center", fontsize=7, color="#333")
+    ax.set_xlabel("horas/año")
+    ax.set_xlim(0, float(vals.max()) * 1.18)  # aire para las etiquetas
+    ax.set_title(f"Horas por nivel · celda ({clat:.2f}, {clon:.2f}) · {year}", fontsize=9)
     fig.tight_layout()
     return fig
 

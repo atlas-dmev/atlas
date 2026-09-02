@@ -3,6 +3,8 @@
 > Rama: `feat/utci-viewer-v1`. Estilo *Thermal Trace* (Copernicus), scopeado a México.
 > Decisiones del usuario: **cubo horario crudo** · **ingesta robusta multi-año/tipo** · **bbox continental + mar**.
 
+> **Fase 2 (capas socioeconómicas INEGI, Censo 2020):** ver [PLAN-SOCIOECONOMICOS.md](../PLAN-SOCIOECONOMICOS.md) — hitos S0–S8, todos completados el 2026-09-02.
+
 ## 0. Hechos verificados del dato (no supuestos)
 
 - Fuente: ERA5-HEAT, `data/UTCI-2022/ECMWF_utci_YYYYMMDD_v1.1_con.area-subset.33.-86.14.-119.nc`.

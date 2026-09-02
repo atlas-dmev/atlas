@@ -96,6 +96,8 @@ Revisión:        qué señal nos haría reconsiderar.
 
 Un ADR sin la fila **Evidencia** está incompleto.
 
+Los ADR existentes están en [adr/](adr/) (0001–0005, fase de capas INEGI).
+
 ---
 
 ## 4. Marco para cuestionar una tecnología

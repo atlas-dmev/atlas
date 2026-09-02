@@ -1,0 +1,9 @@
+# ADR-0003 — Almacenar y servir en EPSG:4326; medir y simplificar en EPSG:6372
+Estado: aceptado (2026-09-02)
+Contexto:        El Marco Geoestadístico 2020 viene en Lambert cónica conforme México ITRF2008 (parámetros de EPSG:6372, aunque el `.prj` no trae el código). El atlas (malla ERA5, `MEXICO_BBOX`, clic del mapa, Leaflet) trabaja en latitud/longitud.
+Opciones:        (a) reproyectar el atlas (raster UTCI y app) a 6372; (b) dejar los vectores en 6372 y reproyectar al vuelo en cada petición; (c) reproyectar los vectores una vez a 4326 en el pipeline, haciendo antes en 6372 lo que requiera metros (centroides, simplificación, áreas).
+Criterios:       no degradar el raster (remuestreo); un solo punto de encuentro para capas futuras; lo que exige el cliente web; costo por petición.
+Evidencia:       Reproyectar un raster remuestrea (pérdida) mientras reproyectar vértices es exacto; GeoJSON exige WGS84 (RFC 7946 §4) y Leaflet proyecta a Web Mercator desde lat/lon; los mapas base disponibles están en EPSG:3857. Spike 004: `to_epsg()` devuelve None pero los parámetros coinciden con 6372 → `set_crs(6372, allow_override=True)`. Referencias: IETF RFC 7946 (GeoJSON); documentación de Leaflet (`L.CRS.EPSG3857`); INEGI, metadatos del Marco Geoestadístico 2020.
+Decisión:        (c). Centroides y simplificación (500 m municipal; medio píxel por zoom en AGEB) se calculan en 6372; los GeoParquet se escriben en 4326.
+Consecuencias:   +cero remuestreo del UTCI; +cualquier cliente web consume directo; −áreas/distancias no deben calcularse sobre el producto final (usar 6372 o una proyección equivalente como Albers si se necesitan áreas precisas, porque LCC es conforme).
+Revisión:        si se necesitara un análisis por superficie (p. ej. ponderar AGEB por área dentro de una celda), añadir columnas de área calculadas en una proyección equivalente en el pipeline.

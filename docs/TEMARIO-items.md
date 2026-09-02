@@ -153,6 +153,38 @@
 
 ---
 
+## Ítems de la fase 2 — capas socioeconómicas INEGI (ambas personas)
+
+> Referencia: [PLAN-SOCIOECONOMICOS.md](../PLAN-SOCIOECONOMICOS.md),
+> [DATOS-INEGI.md](DATOS-INEGI.md) y los ADR 0001–0005 en [adr/](adr/).
+
+### C5 — Censo 2020 e INEGI (dominio)
+- [ ] 📖 Qué es el ITER, la AGEB (urbana vs rural), el Marco Geoestadístico; qué significa el asterisco; `VIVPAR_HAB` vs `VIVPARH_CV`.
+- [ ] 🔨 Reproducir con un estado (p. ej. Aguascalientes) que `VPH_REFRI > VIVPAR_HAB` en muchas AGEB y que nunca supera `VIVPARH_CV`.
+- [ ] 🔍 ¿Imputar, acotar o dejar nulo lo censurado? → ADR-0002; literatura de supresión por umbral en estadística oficial.
+
+### A11 — Formatos vectoriales y catálogo (GeoParquet + STAC *table*)
+- [ ] 📖 Parquet por columnas y row groups; GeoParquet 1.1 y la columna `bbox`; extensión *table* de STAC.
+- [ ] 🔨 Leer sólo dos columnas y una ventana del GeoParquet de AGEB y medir el tiempo; registrar un item STAC nuevo y validarlo con `pystac`.
+- [ ] 🔍 ¿GeoParquet, GeoPackage, PMTiles o DuckDB para este tamaño y este uso? → ADR-0004; especificaciones respectivas.
+
+### A12 — CRS, claves y unión de tablas con geometría
+- [ ] 📖 Proyección conforme vs equivalente; por qué el `.prj` de INEGI no trae código EPSG; claves geoestadísticas de 13 y de 9.
+- [ ] 🔨 Unir el ITER con `00a` reproduciendo el *fallback* de clave de 9 para las 331 AGEB rurales; calcular centroides en 6372 y comparar con calcularlos en 4326.
+- [ ] 🔍 ¿Reproyectar el atlas o los vectores? → ADR-0003; RFC 7946.
+
+### B11 — Coropletas: clases, color y orden de dibujo
+- [ ] 📖 Esquemas de clasificación (cuantiles, Jenks, cortes fijos) y cuándo una clase "cero" es necesaria; rampas que no compiten con otra capa; panes de Leaflet y `zIndex`.
+- [ ] 🔨 Cambiar el esquema de clases del municipal y justificar el efecto en el mapa; mover el raster UTCI de pane y observar qué tapa a qué.
+- [ ] 🔍 ¿Cuantiles nacionales fijos o de la ventana visible? → decisión 4 del plan; Brewer & Pickle (2002) sobre clasificación en coropletas.
+
+### B12 — Capas por ventana y reactividad del mapa
+- [ ] 📖 Eventos `moveend`/`zoomend`; traits `bounds`/`zoom` de ipyleaflet; simplificación ligada al píxel del zoom.
+- [ ] 🔨 Bajar `AGEB_ZOOM_MIN` a 10, medir tamaño y tiempo en CDMX, y decidir con datos; implementar la alternativa "AGEB del municipio pulsado" como spike.
+- [ ] 🔍 ¿Vector por ventana, PNG por ventana o vector tiles? → ADR-0005.
+
+---
+
 ## Cómo evaluar cada ítem
 Un ítem está **completo** cuando: (1) el entregable 🔨 funciona y está commiteado;
 (2) existe el mini-ADR 🔍 con evidencia propia + ≥1 referencia; (3) cumple el
