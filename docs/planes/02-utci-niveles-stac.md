@@ -5,7 +5,7 @@ nivel de estrés térmico en cada punto de malla, catalogarlo en un STAC dentro
 de `data/`, y que la webapp lea del STAC para graficar el nivel que el usuario
 elija de una lista, para todo el país.
 
-> **Fase 2 (capas socioeconómicas INEGI, Censo 2020):** ver [PLAN-SOCIOECONOMICOS.md](PLAN-SOCIOECONOMICOS.md) — hitos S0–S8, todos completados el 2026-09-02.
+> **Fase 2 (capas socioeconómicas INEGI, Censo 2020):** ver [03-capas-inegi-medi.md](03-capas-inegi-medi.md) — hitos S0–S8, todos completados el 2026-09-02.
 
 ## Flujo de datos
 

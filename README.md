@@ -11,8 +11,9 @@ La app deja elegir un **nivel de estrés térmico** (escala UTCI de 10 clases) y
 un **año** (descubierto en el catálogo STAC), pinta el mapa nacional de
 **horas/año** en ese nivel y, al hacer **clic** en una celda, grafica la
 distribución de horas por nivel de esa celda. El panel derecho superpone
-**indicadores socioeconómicos del Censo 2020** (INEGI, diseño MEDI: viviendas
-sin electricidad y sin refrigerador) por municipio o por AGEB urbana, y el clic
+**indicadores socioeconómicos del Censo 2020** (INEGI: los siete componentes
+del índice MEDI de carencia energética y el índice mismo) por estado, municipio
+o AGEB urbana, con una dispersión horas UTCI vs indicador, y el clic
 resume además esas carencias para las AGEB de la celda (cruce UTCI × INEGI).
 
 ![Campo de UTCI máximo diario sobre México](docs/preview.png)
@@ -42,7 +43,7 @@ uv run shiny run app/app.py
 
 Los datos viven **fuera de Git** (`data/`, ignorado). El pipeline son
 libretas reproducibles en `notebooks/`: tres para el UTCI y cuatro para las
-capas socioeconómicas INEGI (ver [PLAN-SOCIOECONOMICOS.md](PLAN-SOCIOECONOMICOS.md)).
+capas socioeconómicas INEGI (ver [docs/planes/03-capas-inegi-medi.md](docs/planes/03-capas-inegi-medi.md)).
 
 ### UTCI
 
@@ -71,13 +72,28 @@ data/derived/INEGI/2020/medi_ageb_2020.parquet    ← GeoParquet AGEB (EPSG:4326
    ▼
 data/derived/INEGI/2020/medi_mun_2020.parquet     ← GeoParquet municipal
 data/derived/INEGI/2020/medi_ageb_2020_grid.parquet ← tabla puente (sin geometría)
-   │  007_STAC_inegi.ipynb          (colección inegi en el mismo catálogo)
+   │  011_ITER_rural.ipynb          (ITER nacional por localidad + puntos rurales del marco →
+   │                                 AGEB rurales añadidas al producto; tabla puente por localidad)
+   │  008_AMPLIADO_mun.ipynb        (Cuestionario ampliado 2020, 32 estados → combustible,
+   │                                 chimenea y AC por municipio/estado/localidad ≥ 50 k, con CV)
+   │  009_CLIMA_confort.ipynb       (regla climática desde la malla UTCI + calefacción ENCEVI)
+   │  010_MEDI_index.ipynb          (confort térmico condicional al clima e índice MEDI
+   │                                 en estado, municipio y AGEB; crea medi_ent_2020.parquet)
+   │  007_STAC_inegi.ipynb          (colección inegi en el mismo catálogo; correr al final)
    ▼
 data/stac/inegi/
 ```
 
-Indicadores (porcentaje de viviendas sobre `VIVPARH_CV`, el denominador oficial
-de INEGI): **sin electricidad** (peso MEDI 0.24) y **sin refrigerador** (0.21).
+Orden completo: 004 → 005 → 006 → 011 → 008 → 009 → 010 → 007.
+
+Indicadores: los **siete componentes del MEDI** y el **índice** (0–100). Del
+ITER, por AGEB, municipio y estado: sin electricidad (0.24), sin refrigerador
+(0.21), sin teléfono (0.08), sin radio/TV (0.07). Del Cuestionario ampliado, por
+municipio, estado y localidad ≥ 50 k, con coeficiente de variación: combustible
+distinto de gas/electricidad (0.13), fogón sin chimenea (0.13) y aire
+acondicionado. Confort térmico (0.14) condicional al clima definido con la
+propia malla UTCI (ADR-0007); calefacción de ENCEVI 2018. Ver
+[docs/DATOS-INEGI.md](docs/DATOS-INEGI.md).
 Los asteriscos de INEGI (indicador con menos de 3 unidades) se guardan como
 nulos con banderas; electricidad lleva además una cota superior.
 
@@ -92,7 +108,7 @@ data/stac/
 │                                  # assets → ../raw/... (nc y COG, rutas relativas)
 └─ inegi/
    ├─ collection.json              # colección inegi (Censo 2020, licencia INEGI)
-   └─ medi-{ageb,mun,grid}-<año>/  # items con extensión table + atlas:indicators
+   └─ medi-{ent,mun,ageb,grid}-<año>/  # items con extensión table + atlas:indicators
                                    # assets → ../derived/... (parquet, rutas relativas)
 ```
 
@@ -131,8 +147,9 @@ components/  (Shiny: panels, servers, shared)  +  app/app.py
 - **Capa socioeconómica** (panel derecho): `atlas/choropleth.py` convierte los
   productos MEDI en `GeoJSON` estilizado por cuantiles nacionales. Municipios:
   nacional, geometría simplificada al vuelo y cacheada. AGEB urbanas: **por
-  ventana**, sólo las que caen en la vista a partir de zoom 11 (filtro por bbox
-  del GeoParquet + simplificación a medio píxel), recargadas al mover el mapa.
+  ventana**, urbanas y rurales, sólo las que caen en la vista a partir de zoom 10
+  (filtro por bbox del GeoParquet + simplificación a medio píxel), recargadas al
+  mover el mapa.
   El raster UTCI vive en un pane inferior para que la coropleta quede siempre encima.
 - **Agregar un año** = correr las libretas 001–003 para ese año; el selector de
   año de la app lo descubre solo vía el STAC.
@@ -147,10 +164,11 @@ src/atlas/       paquete instalable (config, stac, indices, render, choropleth, 
 components/      capa Shiny (shared, panels, servers)
 app/app.py       ensamblado de la app
 notebooks/       pipeline reproducible (001 concatenar, 002 niveles, 003 STAC,
-                 004 marco INEGI, 005 MEDI AGEB, 006 MEDI municipal, 007 STAC inegi)
-PLAN.md          plan e hitos del visor UTCI
-PLAN-SOCIOECONOMICOS.md  plan e hitos de las capas INEGI
-docs/            metodología, temarios, DATOS-INEGI.md (datos del Censo) y adr/ (decisiones)
+                 004 marco INEGI, 005 MEDI AGEB, 006 MEDI municipal, 011 AGEB rurales,
+                 008 ampliado, 009 regla climática, 010 índice MEDI, 007 STAC inegi)
+docs/            metodología, temarios, SUPOSICIONES.md (guía para el equipo: supuestos,
+                 escalas, límites), DATOS-INEGI.md (datos del Censo), adr/ (decisiones)
+                 y planes/ (planes ejecutados: 01 visor v1, 02 UTCI→STAC, 03 capas INEGI)
 data/            datos (fuera de Git): raw/, derived/, stac/
 ```
 
@@ -160,9 +178,9 @@ Anotadas, **no** construidas todavía:
 
 - Tiling dinámico / TiTiler sobre los COGs (innecesario a esta resolución).
 - Anomalías vs climatología 1991-2020; escalas estacional y anual.
-- Vista de dispersión "horas en nivel X vs % sin refrigerador" por AGEB o
-  municipio (el cruce por celda ya está en el pie de página; hito S8 pendiente
-  sólo de documentación).
+- Versión Alkire-Foster del MEDI con microdatos del ampliado; estimación en
+  áreas pequeñas para llevar AC y combustible a AGEB; CONEVAL municipal
+  2010/2015/2020 como serie temporal.
 - Índices propios de confort adaptativo (IMAC, grados-hora) como nuevos
   productos del STAC — el diferenciador de la investigación.
 - Hora local de México (hoy todo se etiqueta en UTC).

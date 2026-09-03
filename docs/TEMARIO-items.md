@@ -155,7 +155,7 @@
 
 ## Ítems de la fase 2 — capas socioeconómicas INEGI (ambas personas)
 
-> Referencia: [PLAN-SOCIOECONOMICOS.md](../PLAN-SOCIOECONOMICOS.md),
+> Referencia: [planes/03-capas-inegi-medi.md](planes/03-capas-inegi-medi.md),
 > [DATOS-INEGI.md](DATOS-INEGI.md) y los ADR 0001–0005 en [adr/](adr/).
 
 ### C5 — Censo 2020 e INEGI (dominio)
@@ -182,6 +182,16 @@
 - [ ] 📖 Eventos `moveend`/`zoomend`; traits `bounds`/`zoom` de ipyleaflet; simplificación ligada al píxel del zoom.
 - [ ] 🔨 Bajar `AGEB_ZOOM_MIN` a 10, medir tamaño y tiempo en CDMX, y decidir con datos; implementar la alternativa "AGEB del municipio pulsado" como spike.
 - [ ] 🔍 ¿Vector por ventana, PNG por ventana o vector tiles? → ADR-0005.
+
+### A13 — Muestras complejas: factor de expansión y varianza por conglomerados
+- [ ] 📖 Diseño estratificado por conglomerados (`ESTRATO`, `UPM`, `FACTOR`); estimador de razón; linealización de Taylor y conglomerado último; coeficiente de variación y reglas de publicación de INEGI.
+- [ ] 🔨 Reproducir para un estado la estimación municipal de "sin aire acondicionado" del ampliado (libreta 008) y comparar el CV con el de una fórmula de muestreo aleatorio simple.
+- [ ] 🔍 ¿Taylor, jackknife o bootstrap de réplicas para este diseño? → Lohr, *Sampling: Design and Analysis*; documentación de `samplics`/`survey` (R).
+
+### B13 — Índices compuestos y su visualización honesta
+- [ ] 📖 Suma ponderada vs conteo tipo Alkire-Foster; intervalos por censura; escalas mezcladas (componentes heredados) y cómo señalarlas en leyenda y tooltip.
+- [ ] 🔨 Cambiar un peso del MEDI en la libreta 010, reejecutar 007 y medir cuántos municipios cambian de clase; añadir al tooltip la descomposición del índice por componente.
+- [ ] 🔍 ¿Debe el atlas mostrar `medi_min`–`medi_max` como incertidumbre visual (p. ej. trama) o basta la nota? → Alkire & Foster (2011); literatura de visualización de incertidumbre en coropletas (MacEachren et al.).
 
 ---
 

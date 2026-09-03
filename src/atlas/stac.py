@@ -8,7 +8,7 @@ Dos colecciones:
 
 - ``utci``: horas/año por nivel de estrés (``utci-levels-<año>``).
 - ``inegi``: indicadores MEDI del Censo 2020 (``medi-<nivel>-<año>`` con
-  nivel ``ageb`` | ``mun`` | ``grid``), en GeoParquet/Parquet.
+  nivel ``ent`` | ``mun`` | ``ageb`` | ``grid``), en GeoParquet/Parquet.
 """
 
 from __future__ import annotations
@@ -28,9 +28,9 @@ from atlas import config
 STAC_DIR = config.DATA_DIR / "stac"
 
 _LEVELS_ID = re.compile(r"^utci-levels-(\d{4})$")
-_MEDI_ID = re.compile(r"^medi-(ageb|mun|grid)-(\d{4})$")
+_MEDI_ID = re.compile(r"^medi-(ent|mun|ageb|grid)-(\d{4})$")
 
-MEDI_LEVELS = ("ageb", "mun", "grid")
+MEDI_LEVELS = ("ent", "mun", "ageb", "grid")
 
 
 @functools.lru_cache(maxsize=1)
@@ -114,14 +114,17 @@ def medi_item(level: str, year: int) -> pystac.Item:
     return item
 
 
-def medi_indicators(year: int) -> list[dict[str, Any]]:
-    """Indicadores publicados en el item AGEB (``atlas:indicators``).
+def medi_indicators(year: int, level: str = "ageb") -> list[dict[str, Any]]:
+    """Indicadores publicados en el item del nivel (``atlas:indicators``).
 
-    Cada uno trae ``id``, ``label``, ``column`` (porcentaje), ``flag_column``,
-    ``upper_bound_column`` (o None), ``weight_medi``, ``numerator`` y
-    ``denominator``. La UI no debe hardcodear indicadores: los lee de aquí.
+    Cada uno trae ``id``, ``label``, ``column`` (porcentaje o índice),
+    ``unit``, ``flag_column``, ``upper_bound_column``, ``cv_column``,
+    ``quality_column`` (o None), ``weight_medi``, ``numerator``,
+    ``denominator``, ``scale_native`` (texto: en qué escala se midió para ese
+    nivel), ``is_index`` y ``components``. La UI no debe hardcodear
+    indicadores: los lee de aquí. ``grid`` publica los de AGEB.
     """
-    return list(medi_item("ageb", year).properties.get("atlas:indicators", []))
+    return list(medi_item(level, year).properties.get("atlas:indicators", []))
 
 
 def medi_path(level: str, year: int) -> Path:
@@ -159,26 +162,43 @@ def open_medi_grid(year: int) -> pd.DataFrame:
 def medi_at(lat: float, lon: float, year: int) -> dict[str, Any]:
     """Resumen MEDI de la celda UTCI de 0.25° más cercana a (lat, lon).
 
-    Suma numerador y denominador sobre las AGEB no censuradas de la celda.
-    Devuelve ``n_ageb``, ``pobtot`` y, por indicador, ``<id>`` (porcentaje o
-    None) y ``<id>_n`` (AGEB usadas).
+    Suma numerador y denominador sobre las unidades no censuradas de la celda:
+    AGEB urbanas (una fila) y localidades rurales (un punto cada una).
+    Devuelve ``n_ageb``, ``n_localidades``, ``pobtot`` (y urbana/rural) y, por
+    indicador, ``<id>`` (porcentaje o None) y ``<id>_n`` (unidades usadas).
     """
     res = config.GRID_RES_DEG
     lat_c = round(round(lat / res) * res, 2)
     lon_c = round(round(lon / res) * res, 2)
     g = open_medi_grid(year)
     sel = g[(g["lat_c"] == lat_c) & (g["lon_c"] == lon_c)]
+    unidad = sel["unidad"] if "unidad" in sel.columns else pd.Series("ageb", index=sel.index)
+    rur = sel[unidad == "localidad"]
+    urb = sel[unidad != "localidad"]
     out: dict[str, Any] = {
         "lat_c": lat_c,
         "lon_c": lon_c,
-        "n_ageb": int(len(sel)),
+        "n_ageb": int(len(urb)),                         # AGEB urbanas (una fila cada una)
+        "n_localidades": int(len(rur)),                  # localidades rurales (puntos)
+        "n_ageb_rural": int(rur["cvegeo"].nunique()) if len(rur) else 0,
         "pobtot": int(sel["pobtot"].sum()) if len(sel) else 0,
+        "pob_urbana": int(urb["pobtot"].sum()) if len(urb) else 0,
+        "pob_rural": int(rur["pobtot"].sum()) if len(rur) else 0,
     }
-    for ind in medi_indicators(year):
-        ok = sel[sel[ind["flag_column"]] == "ok"]
-        den = float(ok[ind["denominator"]].sum()) if len(ok) else 0.0
-        out[ind["id"]] = (
-            round(float(ok[ind["numerator"]].sum()) / den * 100, 2) if den > 0 else None
-        )
-        out[ind["id"] + "_n"] = int(len(ok))
+    for ind in medi_indicators(year, "grid"):
+        num, col, den_col = ind.get("numerator"), ind["column"], ind.get("denominator") or "vivparh_cv"
+        if num and num in sel.columns:
+            # razón agregada: Σ numerador / Σ denominador sobre AGEB no censuradas
+            ok = sel[sel[ind["flag_column"]] == "ok"] if ind.get("flag_column") else sel
+            den = float(ok[den_col].sum()) if len(ok) else 0.0
+            out[ind["id"]] = round(float(ok[num].sum()) / den * 100, 2) if den > 0 else None
+            out[ind["id"] + "_n"] = int(len(ok))
+        elif col in sel.columns:
+            # tasa o índice sin numerador (heredado / compuesto): media ponderada por viviendas
+            ok = sel[sel[col].notna() & sel[den_col].notna()]
+            den = float(ok[den_col].sum()) if len(ok) else 0.0
+            out[ind["id"]] = round(float((ok[col] * ok[den_col]).sum()) / den, 2) if den > 0 else None
+            out[ind["id"] + "_n"] = int(len(ok))
+        else:
+            out[ind["id"]], out[ind["id"] + "_n"] = None, 0
     return out

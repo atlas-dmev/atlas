@@ -291,7 +291,7 @@ leen los xlsx desde libretas.
   evidencia en `docs/adr/` (fuente y denominador, asteriscos, CRS, GeoParquet +
   STAC table, AGEB por ventana). Temario por ítems ampliado con C5, A11, A12,
   B11 y B12. `PLAN.md` y `docs/PLAN.md` enlazan a este plan;
-  `docs/METHODOLOGY.md` apunta a los ADR.
+  `docs/METHODOLOGY.md` apunta a los ADR. (Archivado después en `docs/planes/`.)
 
 ## Pasos que no estaban en la lista original y por qué
 
@@ -314,7 +314,7 @@ leen los xlsx desde libretas.
 ## Decisiones a confirmar
 
 1. **Ubicación de derivados**: este plan propone `data/derived/INEGI/2020/`
-   (el UTCI dejó sus derivados en `data/raw/` por la decisión 1 del PLAN.md).
+   (el UTCI dejó sus derivados en `data/raw/` por la decisión 1 de `02-utci-niveles-stac.md`).
    Si prefieres mantener todo en `raw/`, el STAC funciona igual.
 2. ~~Asteriscos en el agregado municipal~~ — resuelto: el municipal sale de
    las filas municipio oficiales, sin agregar AGEB. En la capa AGEB el
@@ -342,3 +342,13 @@ ignorado; los 365 diarios de 2022 siguen en el índice hasta `git rm -r --cached
 
 Para reproducir desde cero: `uv sync`, luego libretas 001→003 (UTCI) y
 004→007 (INEGI), y `uv run shiny run app/app.py`.
+
+## Adenda (2026-09-02): los cuatro indicadores del ITER
+
+Tras el cierre se activaron los dos MEDI restantes que el ITER mide por AGEB,
+**sin teléfono fijo ni celular** (`VPH_SINLTC`, 0.08) y **sin radio ni
+televisor** (`VPH_SINRTV`, 0.07): porcentajes y banderas en 005 y 006, columnas
+en la tabla puente, y declaración en 007. Sin cambios en la app. Censura AGEB:
+teléfono nulo en 12 663 (20 %), radio/TV en 13 248 (21 %); municipal: radio/TV
+censurado en 3 municipios, teléfono completo. Los tres componentes restantes
+del MEDI (confort térmico, combustible, chimenea) no existen en el ITER por AGEB.

@@ -1,6 +1,6 @@
 import ipyleaflet as L
 from htmltools import HTML, div
-from shiny import reactive, render
+from shiny import reactive, render, ui
 from shinywidgets import render_widget
 
 from atlas import choropleth, plots, stac
@@ -146,13 +146,39 @@ def socio_server(input, base_map, clic=None):
 
     @reactive.calc
     def modo():
-        """'mun' | 'ageb' | 'ageb_lejos' (AGEB pedido pero zoom insuficiente)."""
-        if input.socio_nivel() != "ageb":
-            return "mun"
+        """'ent' | 'mun' | 'ageb' | 'ageb_lejos' (AGEB pedido pero zoom insuficiente)."""
+        nivel = input.socio_nivel()
+        if nivel in ("ent", "mun"):
+            return nivel
         v = vista()
         if v is None or v[0] < choropleth.AGEB_ZOOM_MIN:
             return "ageb_lejos"
         return "ageb"
+
+    def nivel_datos() -> str:
+        """Nivel del producto que se está pintando (ageb_lejos pinta municipios)."""
+        md = modo()
+        return "mun" if md == "ageb_lejos" else md
+
+    @reactive.effect
+    def _indicadores_por_nivel():
+        """La lista de indicadores depende del nivel (cada item STAC publica la suya)."""
+        anio, nivel = int(input.socio_anio()), input.socio_nivel()
+        inds = stac.medi_indicators(anio, nivel)
+        actual = input.socio_ind()
+        ids = [i["id"] for i in inds]
+        ui.update_selectize(
+            "socio_ind",
+            choices={i["id"]: i["label"] for i in inds},
+            selected=actual if actual in ids else (ids[0] if ids else None),
+        )
+
+    def indicador_actual() -> dict | None:
+        anio = int(input.socio_anio())
+        for i in stac.medi_indicators(anio, nivel_datos()):
+            if i["id"] == input.socio_ind():
+                return i
+        return None
 
     @reactive.effect
     def _pintar_socio():
@@ -161,17 +187,21 @@ def socio_server(input, base_map, clic=None):
         if anterior is not None and anterior in m.layers:
             m.remove_layer(anterior)
         estado["layer"] = None
+        hover.set(None)                     # el tooltip no debe mostrar un polígono de la capa anterior
         if not input.socio_on():
             return
         anio, ind, op = int(input.socio_anio()), input.socio_ind(), float(input.socio_opacidad())
-        if modo() == "ageb":
+        if indicador_actual() is None:      # el selector aún no se actualizó al nivel nuevo
+            return
+        md = modo()
+        if md == "ageb":
             zoom, bbox = vista()
             data, n = choropleth.ageb_geojson(anio, ind, bbox, zoom, op)
             ageb_n.set(n)
             nombre = "MEDI AGEB"
         else:
-            data = choropleth.municipal_geojson(anio, ind, op)
-            nombre = "MEDI municipal"
+            data = choropleth.polygon_geojson(nivel_datos(), anio, ind, op)
+            nombre = f"MEDI {nivel_datos()}"
         capa = L.GeoJSON(
             data=data,
             hover_style={"weight": 2, "color": "#222222", "fillOpacity": 0.9},
@@ -206,10 +236,13 @@ def socio_server(input, base_map, clic=None):
         if not input.socio_on():
             return div()
         anio, ind = int(input.socio_anio()), input.socio_ind()
-        nivel = "ageb" if modo() == "ageb" else "mun"
+        nivel = nivel_datos()
+        info = indicador_actual()
+        if info is None:
+            return div()
         items, n_missing = choropleth.legend_items(anio, ind, nivel)
-        etiqueta = next(i["label"] for i in stac.medi_indicators(anio) if i["id"] == ind)
-        unidad = "AGEB urbanas" if nivel == "ageb" else "municipios"
+        etiqueta = info["label"]
+        unidad = {"ageb": "AGEB (urbanas y rurales)", "mun": "municipios", "ent": "estados"}[nivel]
         filas = [
             div(
                 div(style=f"width:14px;height:14px;background:{color};border:1px solid #999;margin-right:8px;flex:none;"),
@@ -232,21 +265,60 @@ def socio_server(input, base_map, clic=None):
             style="margin-top:10px;",
         )
 
+    @render.plot
+    def socio_dispersion():
+        """Horas/año en el nivel UTCI elegido vs indicador socioeconómico, por municipio o estado."""
+        info = indicador_actual()
+        if info is None or not input.socio_on():
+            return plots.placeholder("Capa socioeconómica apagada")
+        nivel = nivel_datos()
+        if nivel == "ageb":
+            nivel = "mun"
+        return plots.socio_scatter(
+            int(input.anio()), LEVELS[input.nivel()], int(input.socio_anio()), info, nivel, input.nivel()
+        )
+
+    @render.ui
+    def socio_escala():
+        """De dónde viene el dato en el nivel mostrado (nativo o heredado)."""
+        info = indicador_actual()
+        if info is None or not input.socio_on():
+            return div()
+        texto = info.get("scale_native") or ""
+        heredado = "hered" in texto or "ENCEVI" in texto
+        return div(
+            HTML(f"<b>Escala del dato:</b> {texto}"),
+            style="font-size:11px;color:#8a4b00;margin-top:8px;" if heredado else "font-size:11px;color:#666;margin-top:8px;",
+        )
+
     @render.ui
     def socio_hover():
         p = hover()
-        if p is None or not input.socio_on():
+        info = indicador_actual()
+        if p is None or not input.socio_on() or info is None:
             return div("Pasa el cursor sobre un polígono.", style="font-size:12px;color:#666;margin-top:10px;")
+        unidad = info.get("unit", "%")
         if p.get("valor") is None:
             valor = f"sin dato ({p.get('flag')})"
             if p.get("cota_sup") is not None:
-                valor += f", a lo más {p['cota_sup']:.2f} %"
+                valor += f", a lo más {p['cota_sup']:.2f} {unidad}"
         else:
-            valor = f"{p['valor']:.2f} %"
+            valor = f"{p['valor']:.2f} {unidad}"
+        if p.get("cv") is not None:
+            calidad = {"ok": "", "aviso": " · precisión media", "poco_preciso": " · POCO PRECISA"}.get(p.get("calidad") or "", "")
+            valor += f" (CV {p['cv']:.0f} %{calidad})"
         if "nom_loc" in p:      # AGEB (NOM_LOC del ITER en filas AGEB es "Total AGEB urbana": no informa)
-            titulo = f"<b>AGEB {p['cvegeo'][-4:]}</b> · {p['nom_mun']}, {p['nom_ent']} ({p['cvegeo']})"
-        else:
+            ambito = p.get("ambito") or "urbana"
+            titulo = f"<b>AGEB {ambito} {p['cvegeo'][-4:]}</b> · {p['nom_mun']}, {p['nom_ent']} ({p['cvegeo']})"
+            if ambito == "rural" and p.get("n_localidades") is not None:
+                titulo += (f" · {int(p['n_localidades'])} localidades"
+                           + (f", {int(p['n_loc_sin_dato'])} de 1–2 viviendas sin indicadores" if p.get("n_loc_sin_dato") else ""))
+            if p.get("origen_ampliado"):
+                titulo += f" · ampliado por {p['origen_ampliado']}"
+        elif "nom_mun" in p:
             titulo = f"<b>{p['nom_mun']}</b>, {p['nom_ent']} ({p['cvegeo']})"
+        else:
+            titulo = f"<b>{p['nom_ent']}</b> ({p['cvegeo']})"
         return div(
             HTML(titulo),
             div(f"Valor: {valor}", style="font-size:12px;"),
@@ -266,20 +338,25 @@ def socio_server(input, base_map, clic=None):
         anio = int(input.socio_anio())
         r = stac.medi_at(c[0], c[1], anio)
         titulo = HTML(f"<b>Censo {anio} en la celda ({r['lat_c']:.2f}, {r['lon_c']:.2f})</b>")
-        if r["n_ageb"] == 0:
-            return div(titulo, div("Sin AGEB urbanas con centroide en esta celda "
-                                   "(zona rural o sin población urbana).", style="margin-top:6px;color:#666;"))
+        if r["n_ageb"] == 0 and r.get("n_localidades", 0) == 0:
+            return div(titulo, div("Sin AGEB urbanas ni localidades rurales con centroide en esta celda.",
+                                   style="margin-top:6px;color:#666;"))
         filas = [
-            div(f"AGEB urbanas: {r['n_ageb']:,} · población: {r['pobtot']:,}", style="margin-top:6px;"),
+            div(f"AGEB urbanas: {r['n_ageb']:,} ({r.get('pob_urbana', 0):,} hab.) · localidades rurales: "
+                f"{r.get('n_localidades', 0):,} en {r.get('n_ageb_rural', 0):,} AGEB ({r.get('pob_rural', 0):,} hab.)",
+                style="margin-top:6px;"),
         ]
-        for ind in stac.medi_indicators(anio):
+        for ind in stac.medi_indicators(anio, "grid"):
             v, n = r.get(ind["id"]), r.get(ind["id"] + "_n", 0)
-            texto = f"{v:.2f} %" if v is not None else "sin dato"
+            unidad = ind.get("unit", "%")
+            texto = f"{v:.2f} {unidad}" if v is not None else "sin dato"
+            peso = "índice" if ind.get("is_index") else f"peso MEDI {ind['weight_medi']}"
+            estilo = "font-weight:bold;" if ind.get("is_index") else ""
             filas.append(div(
-                HTML(f"<b>{ind['label']}:</b> {texto} "
-                     f"<span style='color:#777'>({n:,} AGEB con dato, peso MEDI {ind['weight_medi']})</span>")
+                HTML(f"<span style='{estilo}'>{ind['label']}:</span> {texto} "
+                     f"<span style='color:#777'>({n:,} unidades con dato, {peso})</span>")
             ))
-        filas.append(div("Porcentajes sobre viviendas con características captadas, "
-                         "sumando numerador y denominador de las AGEB no censuradas.",
+        filas.append(div("Tasas del ITER: Σ numerador / Σ denominador de las AGEB urbanas y localidades rurales no censuradas. "
+                         "Componentes heredados (ampliado, ENCEVI) e índice: media ponderada por viviendas.",
                          style="font-size:11px;color:#777;margin-top:6px;"))
         return div(titulo, *filas, style="font-size:12px;")

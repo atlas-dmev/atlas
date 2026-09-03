@@ -1,7 +1,7 @@
 # Metodología — Atlas
 
 > Cómo trabajamos y aprendemos en este proyecto. No es una lista de pasos ni un
-> calendario (para eso están [PLAN.md](PLAN.md) y los temarios
+> calendario (para eso están los planes de [planes/](planes/) y los temarios
 > [TEMARIO.md](TEMARIO.md) / [TEMARIO-items.md](TEMARIO-items.md)). Es una
 > **forma de proceder** que se aplica igual a una decisión de una línea o a un
 > módulo entero, y que pone en el centro **cuestionar cada elección contra la

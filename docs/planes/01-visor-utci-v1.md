@@ -3,7 +3,7 @@
 > Rama: `feat/utci-viewer-v1`. Estilo *Thermal Trace* (Copernicus), scopeado a México.
 > Decisiones del usuario: **cubo horario crudo** · **ingesta robusta multi-año/tipo** · **bbox continental + mar**.
 
-> **Fase 2 (capas socioeconómicas INEGI, Censo 2020):** ver [PLAN-SOCIOECONOMICOS.md](../PLAN-SOCIOECONOMICOS.md) — hitos S0–S8, todos completados el 2026-09-02.
+> **Fase 2 (capas socioeconómicas INEGI, Censo 2020):** ver [03-capas-inegi-medi.md](03-capas-inegi-medi.md) — hitos S0–S8, todos completados el 2026-09-02.
 
 ## 0. Hechos verificados del dato (no supuestos)
 
@@ -72,7 +72,7 @@ atlas/
 ├─ README.md               # qué es + cómo: uv sync, atlas-ingest ..., uv run app
 ├─ .gitignore              # data/, .venv/, __pycache__/, *.zarr  ← protege el cubo
 ├─ docs/
-│  └─ PLAN.md              # este documento
+│  └─ PLAN.md              # este documento (hoy docs/planes/01-visor-utci-v1.md)
 ├─ data/                   # FUERA de git (no se empaqueta)
 │  ├─ raw/UTCI/2022/*.nc   # NetCDF fuente (reorganizado por tipo/año)
 │  └─ utci_mexico.zarr/    # cubo construido (artefacto)

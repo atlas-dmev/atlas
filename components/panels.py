@@ -85,17 +85,21 @@ def socio_panel(indicators, years):
         ui.input_selectize(
             "socio_nivel",
             "Nivel",
-            choices={"mun": "Municipio", "ageb": "AGEB urbana (al acercar)"},
+            choices={"ent": "Estado", "mun": "Municipio", "ageb": "AGEB urbana (al acercar)"},
             selected="mun",
         ),
         ui.input_slider("socio_opacidad", "Opacidad", min=0.1, max=1.0, value=0.65, step=0.05),
         ui.output_ui("socio_aviso"),
         ui.output_ui("socio_leyenda"),
         ui.output_ui("socio_hover"),
+        ui.output_ui("socio_escala"),
+        ui.output_plot("socio_dispersion", height="230px"),
         ui.tags.p(
-            "Municipio: totales del Censo 2020 (urbano + rural). AGEB: sólo AGEB "
-            "urbanas, cargadas para la ventana visible al acercar el mapa. "
-            "Gris: dato censurado por INEGI (< 3 viviendas) o sin viviendas.",
+            "Estado y municipio: totales del Censo 2020 (urbano + rural). AGEB: urbanas "
+            "(ITER) y rurales (suma de sus localidades; trazo punteado y menos opacidad), "
+            "cargadas para la ventana visible al acercar el mapa. "
+            "Gris: dato censurado por INEGI (< 3 viviendas) o sin viviendas. "
+            "Borde rojo punteado: estimación del Cuestionario ampliado con CV > 30 %.",
             style="font-size:11px;color:#666;margin-top:10px;",
         ),
     )
