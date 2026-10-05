@@ -1,0 +1,27 @@
+{
+  "type": "Catalog",
+  "id": "atlas",
+  "stac_version": "1.1.0",
+  "description": "Atlas de confort térmico de México (IER-UNAM). Catálogo de datos rasterizados para la webapp.",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./catalog.json",
+      "type": "application/json",
+      "title": "Atlas IER-UNAM"
+    },
+    {
+      "rel": "child",
+      "href": "./utci/collection.json",
+      "type": "application/json",
+      "title": "UTCI — Universal Thermal Climate Index (ERA5-HEAT)"
+    },
+    {
+      "rel": "child",
+      "href": "./inegi/collection.json",
+      "type": "application/json",
+      "title": "INEGI — indicadores socioeconómicos (Censo 2020, MEDI)"
+    }
+  ],
+  "title": "Atlas IER-UNAM"
+}

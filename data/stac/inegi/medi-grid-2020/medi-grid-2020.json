@@ -1,0 +1,386 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/table/v1.2.0/schema.json"
+  ],
+  "id": "medi-grid-2020",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -118.3651,
+          14.5321
+        ],
+        [
+          -86.7109,
+          14.5321
+        ],
+        [
+          -86.7109,
+          32.7187
+        ],
+        [
+          -118.3651,
+          32.7187
+        ],
+        [
+          -118.3651,
+          14.5321
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -118.3651,
+    14.5321,
+    -86.7109,
+    32.7187
+  ],
+  "properties": {
+    "start_datetime": "2020-03-02T00:00:00+00:00",
+    "end_datetime": "2020-03-27T00:00:00+00:00",
+    "atlas:level": "ageb_grid",
+    "atlas:census_year": 2020,
+    "atlas:grid_res_deg": 0.25,
+    "atlas:indicators": [
+      {
+        "id": "sin_elec",
+        "label": "Viviendas sin electricidad (%)",
+        "column": "p_sin_elec",
+        "weight_medi": 0.24,
+        "unit": "%",
+        "flag_column": "flag_elec",
+        "upper_bound_column": "p_sin_elec_sup",
+        "numerator": "vph_s_elec",
+        "denominator": "vivparh_cv",
+        "cv_column": null,
+        "quality_column": null,
+        "is_index": false,
+        "components": null,
+        "scale_native": "ageb"
+      },
+      {
+        "id": "sin_refri",
+        "label": "Viviendas sin refrigerador (%)",
+        "column": "p_sin_refri",
+        "weight_medi": 0.21,
+        "unit": "%",
+        "flag_column": "flag_refri",
+        "upper_bound_column": null,
+        "numerator": "vph_sin_refri",
+        "denominator": "vivparh_cv",
+        "cv_column": null,
+        "quality_column": null,
+        "is_index": false,
+        "components": null,
+        "scale_native": "ageb"
+      },
+      {
+        "id": "sin_confort",
+        "label": "Sin confort térmico condicional al clima (%)",
+        "column": "p_sin_confort",
+        "weight_medi": 0.14,
+        "unit": "%",
+        "flag_column": null,
+        "upper_bound_column": null,
+        "numerator": null,
+        "denominator": "vivparh_cv",
+        "cv_column": null,
+        "quality_column": null,
+        "is_index": false,
+        "components": null,
+        "scale_native": "AC: localidad/municipio (ampliado, heredado); calefacción: estado (ENCEVI 2018); clima: celda UTCI"
+      },
+      {
+        "id": "lena",
+        "label": "Cocinan con leña, carbón u otro combustible (%)",
+        "column": "p_lena",
+        "weight_medi": 0.13,
+        "unit": "%",
+        "flag_column": null,
+        "upper_bound_column": null,
+        "numerator": null,
+        "denominator": "vivparh_cv",
+        "cv_column": "cv_lena",
+        "quality_column": "calidad_lena",
+        "is_index": false,
+        "components": null,
+        "scale_native": "localidad ≥ 50 k o municipio (heredado)"
+      },
+      {
+        "id": "fogon_sin_chim",
+        "label": "Cocinan con leña o carbón sin chimenea (%)",
+        "column": "p_fogon_sin_chim",
+        "weight_medi": 0.13,
+        "unit": "%",
+        "flag_column": null,
+        "upper_bound_column": null,
+        "numerator": null,
+        "denominator": "vivparh_cv",
+        "cv_column": "cv_fogon_sin_chim",
+        "quality_column": "calidad_fogon_sin_chim",
+        "is_index": false,
+        "components": null,
+        "scale_native": "localidad ≥ 50 k o municipio (heredado)"
+      },
+      {
+        "id": "sin_telef",
+        "label": "Viviendas sin teléfono fijo ni celular (%)",
+        "column": "p_sin_telef",
+        "weight_medi": 0.08,
+        "unit": "%",
+        "flag_column": "flag_telef",
+        "upper_bound_column": null,
+        "numerator": "vph_sinltc",
+        "denominator": "vivparh_cv",
+        "cv_column": null,
+        "quality_column": null,
+        "is_index": false,
+        "components": null,
+        "scale_native": "ageb"
+      },
+      {
+        "id": "sin_rtv",
+        "label": "Viviendas sin radio ni televisor (%)",
+        "column": "p_sin_rtv",
+        "weight_medi": 0.07,
+        "unit": "%",
+        "flag_column": "flag_rtv",
+        "upper_bound_column": null,
+        "numerator": "vph_sinrtv",
+        "denominator": "vivparh_cv",
+        "cv_column": null,
+        "quality_column": null,
+        "is_index": false,
+        "components": null,
+        "scale_native": "ageb"
+      },
+      {
+        "id": "sin_ac",
+        "label": "Viviendas sin aire acondicionado (%) — insumo del confort térmico",
+        "column": "p_sin_ac",
+        "weight_medi": 0.0,
+        "unit": "%",
+        "flag_column": null,
+        "upper_bound_column": null,
+        "numerator": null,
+        "denominator": "vivparh_cv",
+        "cv_column": "cv_sin_ac",
+        "quality_column": "calidad_sin_ac",
+        "is_index": false,
+        "components": null,
+        "scale_native": "localidad ≥ 50 k o municipio (heredado)"
+      },
+      {
+        "id": "medi",
+        "label": "Índice MEDI (0–100)",
+        "column": "medi",
+        "weight_medi": 1.0,
+        "unit": "pts",
+        "flag_column": null,
+        "upper_bound_column": null,
+        "numerator": null,
+        "denominator": "vivparh_cv",
+        "cv_column": null,
+        "quality_column": null,
+        "is_index": true,
+        "components": {
+          "sin_elec": 0.24,
+          "sin_refri": 0.21,
+          "sin_confort": 0.14,
+          "lena": 0.13,
+          "fogon_sin_chim": 0.13,
+          "sin_telef": 0.08,
+          "sin_rtv": 0.07
+        },
+        "scale_native": "4 componentes propios de la AGEB + 3 heredados (localidad/municipio); calefacción estatal"
+      }
+    ],
+    "atlas:climate_rule": {
+      "anios_utci": "2022,2023",
+      "nivel_calor_min": 7.0,
+      "nivel_frio_max": 3.0,
+      "H_CALOR": 902.0,
+      "H_FRIO": 626.0,
+      "coincidencia_ac": 0.9542033750148317,
+      "coincidencia_calef": 0.8777613196448675,
+      "umbral_calef_estado_pct": 8.0
+    },
+    "atlas:source": [
+      "INEGI. Censo de Población y Vivienda 2020. Principales resultados por AGEB y manzana urbana (datos abiertos, 32 archivos)",
+      "INEGI. Marco Geoestadístico. Censo de Población y Vivienda 2020 (mg_2020_integrado)"
+    ],
+    "atlas:notebook": "notebooks/006_MEDI_mun.ipynb + 010",
+    "table:columns": [
+      {
+        "name": "cvegeo",
+        "type": "large_string",
+        "description": "Clave geoestadística INEGI (13 = AGEB urbana, 5 = municipio)"
+      },
+      {
+        "name": "lat_c",
+        "type": "double",
+        "description": "Latitud del centro de la celda UTCI de 0.25° que contiene el centroide"
+      },
+      {
+        "name": "lon_c",
+        "type": "double",
+        "description": "Longitud del centro de la celda UTCI"
+      },
+      {
+        "name": "pobtot",
+        "type": "int64",
+        "description": "Población total"
+      },
+      {
+        "name": "vivparh_cv",
+        "type": "int64",
+        "description": "Viviendas particulares habitadas con características captadas (denominador de los VPH_*)"
+      },
+      {
+        "name": "vph_s_elec",
+        "type": "int64",
+        "description": "Viviendas sin energía eléctrica"
+      },
+      {
+        "name": "vph_c_elec",
+        "type": "int64",
+        "description": "Viviendas con energía eléctrica"
+      },
+      {
+        "name": "vph_refri",
+        "type": "int64",
+        "description": "Viviendas con refrigerador"
+      },
+      {
+        "name": "vph_sin_refri",
+        "type": "int64",
+        "description": "Viviendas sin refrigerador (vivparh_cv − vph_refri)"
+      },
+      {
+        "name": "vph_sinltc",
+        "type": "int64",
+        "description": "Viviendas sin línea telefónica ni celular"
+      },
+      {
+        "name": "vph_sinrtv",
+        "type": "int64",
+        "description": "Viviendas sin radio ni televisor"
+      },
+      {
+        "name": "flag_elec",
+        "type": "large_string",
+        "description": "ok | censurado | sin_viviendas"
+      },
+      {
+        "name": "flag_refri",
+        "type": "large_string",
+        "description": "ok | censurado | sin_viviendas"
+      },
+      {
+        "name": "flag_telef",
+        "type": "large_string",
+        "description": "ok | censurado | sin_viviendas"
+      },
+      {
+        "name": "flag_rtv",
+        "type": "large_string",
+        "description": "ok | censurado | sin_viviendas"
+      },
+      {
+        "name": "unidad",
+        "type": "large_string"
+      },
+      {
+        "name": "cve_loc",
+        "type": "large_string",
+        "description": "Clave de localidad"
+      },
+      {
+        "name": "nom_loc",
+        "type": "large_string",
+        "description": "Localidad"
+      },
+      {
+        "name": "p_lena",
+        "type": "double",
+        "description": "% viviendas que cocinan con leña, carbón u otro combustible (≠ gas/electricidad), sobre las que cocinan; Cuestionario ampliado 2020"
+      },
+      {
+        "name": "p_fogon_sin_chim",
+        "type": "double",
+        "description": "% viviendas que cocinan con leña/carbón sin chimenea, sobre las que cocinan; ampliado 2020"
+      },
+      {
+        "name": "p_sin_ac",
+        "type": "double",
+        "description": "% viviendas sin aire acondicionado; ampliado 2020"
+      },
+      {
+        "name": "p_sin_confort",
+        "type": "double",
+        "description": "% carencia de confort térmico condicional al clima (AC donde hace calor, calefacción donde hace frío)"
+      },
+      {
+        "name": "medi",
+        "type": "double",
+        "description": "Índice MEDI 0–100 (suma ponderada de las 7 carencias)"
+      },
+      {
+        "name": "medi_min",
+        "type": "double",
+        "description": "MEDI con los componentes censurados en 0"
+      },
+      {
+        "name": "medi_max",
+        "type": "double",
+        "description": "MEDI con los componentes censurados en su cota superior"
+      },
+      {
+        "name": "necesita_ac",
+        "type": "bool",
+        "description": "Regla climática: h_calor ≥ H_CALOR"
+      },
+      {
+        "name": "necesita_calef",
+        "type": "bool",
+        "description": "Regla climática: h_frio ≥ H_FRIO"
+      }
+    ],
+    "table:row_count": 248503,
+    "datetime": "2020-03-15T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json",
+      "title": "Atlas IER-UNAM"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "INEGI — indicadores socioeconómicos (Censo 2020, MEDI)"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "INEGI — indicadores socioeconómicos (Censo 2020, MEDI)"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "../../../derived/INEGI/2020/medi_ageb_2020_grid.parquet",
+      "type": "application/vnd.apache.parquet",
+      "title": "Tabla puente AGEB → celda UTCI 0.25° con conteos MEDI (Parquet)",
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "collection": "inegi"
+}

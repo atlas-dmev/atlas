@@ -1,0 +1,77 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [],
+  "id": "utci-hourly-2023",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -118.5,
+          14.0
+        ],
+        [
+          -86.0,
+          14.0
+        ],
+        [
+          -86.0,
+          33.5
+        ],
+        [
+          -118.5,
+          33.5
+        ],
+        [
+          -118.5,
+          14.0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -118.5,
+    14.0,
+    -86.0,
+    33.5
+  ],
+  "properties": {
+    "start_datetime": "2023-01-01T00:00:00+00:00",
+    "end_datetime": "2023-12-31T23:00:00+00:00",
+    "utci:variable": "utci",
+    "utci:units": "degC",
+    "datetime": null
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json",
+      "title": "Atlas IER-UNAM"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "UTCI — Universal Thermal Climate Index (ERA5-HEAT)"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "UTCI — Universal Thermal Climate Index (ERA5-HEAT)"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "../../../raw/UTCI/2023/UTCI_Mexico_2023.nc",
+      "type": "application/x-netcdf",
+      "title": "UTCI horario México 2023 (NetCDF)",
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "collection": "utci"
+}

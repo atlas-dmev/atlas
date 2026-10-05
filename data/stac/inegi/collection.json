@@ -1,0 +1,93 @@
+{
+  "type": "Collection",
+  "id": "inegi",
+  "stac_version": "1.1.0",
+  "description": "Indicadores de carencia energética del diseño MEDI a partir del Censo de Población y Vivienda 2020 (INEGI): los siete componentes del MEDI (electricidad, refrigerador, teléfono, radio/TV del ITER; combustible, fogón sin chimenea y aire acondicionado del Cuestionario ampliado; calefacción de ENCEVI 2018) con confort térmico condicional al clima definido con la malla UTCI del atlas, y el índice MEDI (0–100) por estado, municipio y AGEB urbana sobre el Marco Geoestadístico 2020. Incluye la tabla puente AGEB → celda de 0.25° de la malla UTCI.",
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Atlas IER-UNAM"
+    },
+    {
+      "rel": "license",
+      "href": "https://www.inegi.org.mx/inegi/terminos.html",
+      "title": "Términos de Libre Uso de la Información del INEGI"
+    },
+    {
+      "rel": "item",
+      "href": "./medi-ent-2020/medi-ent-2020.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./medi-mun-2020/medi-mun-2020.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./medi-ageb-2020/medi-ageb-2020.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "item",
+      "href": "./medi-grid-2020/medi-grid-2020.json",
+      "type": "application/geo+json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Atlas IER-UNAM"
+    }
+  ],
+  "title": "INEGI — indicadores socioeconómicos (Censo 2020, MEDI)",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -118.3651,
+          14.5321,
+          -86.7104,
+          32.7187
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2020-03-02T00:00:00Z",
+          "2020-03-27T00:00:00Z"
+        ]
+      ]
+    }
+  },
+  "license": "other",
+  "keywords": [
+    "INEGI",
+    "Censo 2020",
+    "AGEB",
+    "municipio",
+    "MEDI",
+    "pobreza energética",
+    "México"
+  ],
+  "providers": [
+    {
+      "name": "INEGI",
+      "description": "Censo de Población y Vivienda 2020: Principales resultados por AGEB y manzana urbana; Marco Geoestadístico 2020",
+      "roles": [
+        "producer",
+        "licensor"
+      ],
+      "url": "https://www.inegi.org.mx/programas/ccpv/2020/"
+    },
+    {
+      "name": "IER-UNAM (atlas)",
+      "roles": [
+        "processor"
+      ]
+    }
+  ]
+}

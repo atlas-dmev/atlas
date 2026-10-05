@@ -1,0 +1,11 @@
+# Datos: no se versionan (excepto los catálogos STAC)
+data/*
+!data/stac/
+
+# Python
+__pycache__/
+.venv/
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store

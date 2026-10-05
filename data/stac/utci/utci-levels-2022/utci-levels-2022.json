@@ -1,0 +1,121 @@
+{
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [],
+  "id": "utci-levels-2022",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -118.5,
+          14.0
+        ],
+        [
+          -86.0,
+          14.0
+        ],
+        [
+          -86.0,
+          33.0
+        ],
+        [
+          -118.5,
+          33.0
+        ],
+        [
+          -118.5,
+          14.0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -118.5,
+    14.0,
+    -86.0,
+    33.0
+  ],
+  "properties": {
+    "start_datetime": "2022-01-01T00:00:00+00:00",
+    "end_datetime": "2022-12-31T23:00:00+00:00",
+    "utci:variable": "hours",
+    "utci:units": "h",
+    "utci:levels": [
+      "extreme_cold_stress",
+      "very_strong_cold_stress",
+      "strong_cold_stress",
+      "moderate_cold_stress",
+      "slight_cold_stress",
+      "no_thermal_stress",
+      "moderate_heat_stress",
+      "strong_heat_stress",
+      "very_strong_heat_stress",
+      "extreme_heat_stress"
+    ],
+    "utci:levels_es": [
+      "estrés por frío extremo",
+      "estrés por frío muy fuerte",
+      "estrés por frío fuerte",
+      "estrés por frío moderado",
+      "estrés por frío ligero",
+      "sin estrés térmico",
+      "estrés por calor moderado",
+      "estrés por calor fuerte",
+      "estrés por calor muy fuerte",
+      "estrés por calor extremo"
+    ],
+    "utci:bounds_degC": [
+      -40.0,
+      -27.0,
+      -13.0,
+      0.0,
+      9.0,
+      26.0,
+      32.0,
+      38.0,
+      46.0
+    ],
+    "datetime": null
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json",
+      "title": "Atlas IER-UNAM"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "UTCI — Universal Thermal Climate Index (ERA5-HEAT)"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "UTCI — Universal Thermal Climate Index (ERA5-HEAT)"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "../../../raw/UTCI/2022/UTCI_levels_2022.nc",
+      "type": "application/x-netcdf",
+      "title": "Horas anuales por nivel de estrés UTCI, México 2022 (NetCDF)",
+      "roles": [
+        "data"
+      ]
+    },
+    "cog": {
+      "href": "../../../raw/UTCI/2022/UTCI_levels_2022_cog.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Horas anuales por nivel de estrés UTCI, México 2022 (COG, banda = nivel+1)",
+      "roles": [
+        "data",
+        "overview"
+      ]
+    }
+  },
+  "collection": "utci"
+}
