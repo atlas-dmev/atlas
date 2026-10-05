@@ -109,7 +109,7 @@ app: capa AGEB por ventana ya pinta rurales; leyenda y tooltip avisan el ámbito
   zoom bajado a 10 (medición: Oaxaca rural 2.4 MB a zoom 9, 1.1 MB a zoom 10;
   CDMX 6.5 MB a zoom 9, 4.3 MB a zoom 10). Verificado en Chromium: ventana de
   valles centrales de Oaxaca a zoom 10 con 506 AGEB, 189 rurales punteadas.
-- [x] **R6 — Documentación.** ADR-0008, `docs/DATOS-INEGI.md` §12,
+- [x] **R6 — Documentación.** ADR-0008, `docs/DATOS.md` §12,
   `docs/SUPOSICIONES.md` (§2, §4, §5, §8, FAQ), README (orden del pipeline
   con 011).
 

@@ -74,6 +74,16 @@ Que las dos capas no compitan por el relleno. Dos variantes:
 - Costo: ~1 día. Riesgo: paleta y leyenda exigen cuidado (accesibilidad,
   daltonismo); a nivel AGEB la clase de horas es la de la celda, gruesa.
 
+### V5b — La dispersión, fuera del panel (decidido 2026-09-02)
+- La gráfica "horas UTCI vs indicador" por municipio se **retiró del panel
+  derecho**: en 320 px era ilegible (título cortado, columnas de municipios
+  que comparten celda) y no reaccionaba al clic, lo que confundía. La función
+  `plots.socio_scatter` se conserva como herramienta de análisis (libretas).
+- El cruce cuantificado pasa a V5 (capa bivariada en el mapa) y, si hace
+  falta una vista con espacio propio, a una futura vista de análisis con:
+  resaltado del municipio pulsado, nombre del indicador en el eje, opción de
+  restringir a la ventana visible y nota sobre la correlación ecológica.
+
 ### V6 — Legibilidad del propio UTCI
 - Rampa del nivel con más contraste en la cola alta (`render._hours_cmap`).
 - Borde de celda (rejilla fina) para que el raster se perciba como dato y no
@@ -97,7 +107,7 @@ Que las dos capas no compitan por el relleno. Dos variantes:
 - [ ] **V2** — radio de orden (UTCI / socio / mezcla) con intercambio de
   `zIndex` y `mix-blend-mode`. Verificación: capturas de los tres modos sobre
   la misma vista; el hover sigue funcionando en los tres.
-- [ ] **V5** — capa bivariada municipal y estatal con leyenda 3 × 3.
+- [ ] **V5** — capa bivariada municipal y estatal con leyenda 3 × 3 (sustituye a la dispersión retirada, V5b).
   Verificación: la clase bivariada coincide con las clases univariadas de la
   leyenda de cada capa; captura nacional; el clic en un municipio muestra las
   dos clases en el tooltip.

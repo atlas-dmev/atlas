@@ -156,7 +156,7 @@
 ## Ítems de la fase 2 — capas socioeconómicas INEGI (ambas personas)
 
 > Referencia: [planes/03-capas-inegi-medi.md](planes/03-capas-inegi-medi.md),
-> [DATOS-INEGI.md](DATOS-INEGI.md) y los ADR 0001–0005 en [adr/](adr/).
+> [DATOS.md](DATOS.md) y los ADR 0001–0005 en [adr/](adr/).
 
 ### C5 — Censo 2020 e INEGI (dominio)
 - [ ] 📖 Qué es el ITER, la AGEB (urbana vs rural), el Marco Geoestadístico; qué significa el asterisco; `VIVPAR_HAB` vs `VIVPARH_CV`.

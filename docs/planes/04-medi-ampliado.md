@@ -155,8 +155,10 @@ propias de la AGEB (vienen de su celda UTCI).
   componentes y el MEDI (media ponderada por viviendas para heredados e
   índice). Nueva gráfica en el panel derecho: dispersión horas/año en el nivel
   UTCI elegido (celda del centroide) vs indicador actual, por municipio o
-  estado, tamaño ∝ población, con ρ de Spearman.
-- [x] **T7 — Documentación.** `docs/DATOS-INEGI.md` (secciones 8–10),
+  estado, tamaño ∝ población, con ρ de Spearman. *(Retirada del panel el
+  2026-09-02 por ilegible en 320 px; la función `plots.socio_scatter` queda
+  para análisis; ver PLAN-VISIBILIDAD V5b.)*
+- [x] **T7 — Documentación.** `docs/DATOS.md` (secciones 8–10),
   ADR-0006 y ADR-0007, README, temario (A13, B13). Archivado en
   `docs/planes/04-medi-ampliado.md`; el ADR-0006 sigue *propuesto* hasta que
   el equipo lo confirme.

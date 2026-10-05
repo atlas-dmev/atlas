@@ -2,19 +2,45 @@
 
 > Todo lo que hay que saber antes de usar, citar o cuestionar una capa del
 > atlas. Cada punto remite a la evidencia (libreta) y a la decisión (ADR) que
-> lo sustenta. Estado al 2026-09-02. Documentos hermanos:
-> [DATOS-INEGI.md](DATOS-INEGI.md) (metodología de datos, con cifras),
+> lo sustenta. Estado al 2026-09-02 (commit `f147343`). Documentos hermanos:
+> [DATOS.md](DATOS.md) (metodología de datos, con cifras),
 > [adr/](adr/) (decisiones con evidencia), [planes/](planes/) (hitos cerrados),
 > [planes/04-medi-ampliado.md](planes/04-medi-ampliado.md) (último plan, cerrado).
 
 ---
+
+## 0. Glosario y claves
+
+- **UTCI** (*Universal Thermal Climate Index*): temperatura equivalente que
+  integra aire, humedad, viento y radiación. El atlas usa la escala ISB de 10
+  niveles: 0 frío extremo (< −40 °C), 1 frío muy fuerte (−40 a −27), 2 frío
+  fuerte (−27 a −13), 3 frío moderado (−13 a 0), 4 frío ligero (0 a 9), 5 sin
+  estrés (9 a 26), 6 calor moderado (26 a 32), 7 calor fuerte (32 a 38), 8
+  calor muy fuerte (38 a 46), 9 calor extremo (> 46). "Horas por nivel" son
+  las horas del año en que el UTCI de la celda cayó en cada nivel.
+- **ITER**: Principales resultados por localidad / por AGEB y manzana urbana
+  del Censo (cuestionario básico, universo). **Ampliado**: cuestionario
+  ampliado del Censo (muestra). **ENCEVI**: Encuesta Nacional sobre Consumo de
+  Energéticos en Viviendas Particulares 2018.
+- **AGEB**: área geoestadística básica. Urbana: manzanas en localidades de
+  ≥ 2 500 hab. o cabeceras; rural: territorio con localidades dispersas.
+- **MEDI**: índice de carencias energéticas del hogar según el diseño del
+  equipo (`descriptores_MEDI.xlsx`: 7 carencias con pesos). **Las siglas y la
+  referencia publicada del diseño no están en el repositorio**: pedirlas al
+  equipo para citarlas (§14).
+- **Claves** (`cvegeo`): estado 2 dígitos; municipio 5; AGEB rural 9
+  (`ENT+MUN+AGEB`); AGEB urbana 13 (`ENT+MUN+LOC+AGEB`); localidad 9
+  (`ENT+MUN+LOC`). Siempre con ceros a la izquierda; nunca usar la columna
+  concatenada del extracto.
 
 ## 1. Qué es el atlas y qué no es
 
 - Es un **visor de estrés térmico (UTCI, ERA5-HEAT) para México** cruzado con
   **carencias energéticas del hogar (MEDI, Censo 2020)**. Sirve para ver dónde
   coinciden calor y carencia, a tres escalas, y para explorar la relación
-  entre ambas por celda, municipio o estado.
+  entre ambas por celda, municipio o estado (en el mapa y en el resumen por
+  celda; el cruce cuantificado vive en las libretas y en la futura capa
+  bivariada del plan de visibilidad).
 - **No es** una medición de pobreza energética por hogar: por AGEB y municipio
   sólo hay tasas agregadas, no microdatos de todos los componentes (§7).
 - **No es** una serie temporal: cada fuente tiene su fecha (§9). El UTCI se
@@ -29,7 +55,7 @@ viene**, porque de eso depende a qué escala es válido.
 
 | fuente | qué es | cobertura | unidad válida | año | error |
 |---|---|---|---|---|---|
-| **ERA5-HEAT (Copernicus)** | reanálisis global; UTCI horario en malla de 0.25° (~27 km) | todo México + mar; celdas con UTCI indefinido (viento fuera del rango de la fórmula, p. ej. Tehuantepec) tienen menos de 8 760 h válidas | la celda; no describe microclimas urbanos ni islas de calor | 2022 y 2023 catalogados; tiempo en UTC | modelo, sin error muestral; sesgos de reanálisis |
+| **ERA5-HEAT (Copernicus)** | reanálisis global; UTCI horario en malla de 0.25° (~27 km), en kelvin en el archivo y convertido a °C al clasificar | todo México + mar; celdas con UTCI indefinido (viento fuera del rango de la fórmula, p. ej. Tehuantepec) tienen menos de 8 760 h válidas (`valid_hours`); los diarios de 2022 vienen recortados a 33 °N y los de 2023 a 33.5 °N, así que la regla climática usa la malla común | la celda; no describe microclimas urbanos ni islas de calor | 2022 y 2023 catalogados; tiempo en UTC, no hora local | modelo, sin error muestral; sesgos de reanálisis |
 | **ITER básico, Censo 2020** ("Principales resultados por AGEB y manzana urbana") | conteos del cuestionario básico para el **universo** de viviendas | AGEB **urbanas** (localidades ≥ 2 500 hab. o cabeceras); filas municipio y entidad son totales completos, urbano + rural | AGEB urbana, municipio, estado | levantamiento 2–27 marzo 2020 | sin error muestral; **censura** por confidencialidad (asterisco = menos de 3 unidades) |
 | **ITER nacional, Censo 2020** (una fila por localidad) | mismas 230 variables por **localidad**, urbana y rural | todas las localidades habitadas; las de 1–2 viviendas sólo con población | localidad; sumadas por clave dan la **AGEB rural** (§4) | marzo 2020 | sin error muestral; censura por localidad completa en las de 1–2 viviendas |
 | **Cuestionario ampliado, Censo 2020** (microdatos `Viviendas_CA`) | **muestra probabilística** de 4 016 627 viviendas (factores suman 34.99 M) | nacional | válido para nacional, estado, **cada municipio** y **localidades de 50 000+ hab.**; no por AGEB | marzo 2020 | error muestral: coeficiente de variación publicado por unidad (§5) |
@@ -85,7 +111,7 @@ rurales y se unen por su clave de 9).
 | componente | estado | municipio | AGEB |
 |---|---|---|---|
 | electricidad, refrigerador, teléfono, radio/TV | propio (ITER, fila entidad) | propio (ITER, fila municipio: urbano + rural) | **propio** (ITER por AGEB en urbanas; suma de localidades del ITER nacional en rurales) |
-| combustible, chimenea, AC | propio (ampliado) | propio (ampliado, con CV) | **heredado**: de la localidad ≥ 50 k si la AGEB pertenece a una (31 248 AGEB, 49 %; 67 % de la población urbana), si no del municipio (`origen_ampliado`) |
+| combustible, chimenea, AC | propio (ampliado) | propio (ampliado, con CV) | **heredado**: de la localidad ≥ 50 k si la AGEB pertenece a una (31 248 AGEB urbanas, 49 % de las urbanas y 39 % del total con rurales; 67 % de la población urbana), si no del municipio (`origen_ampliado`; todas las rurales) |
 | calefacción | heredado de la ENCEVI (estado) | heredado (estado) | heredado (estado) |
 | necesidad de AC / calefacción (clima) | población de sus municipios | población de sus AGEB; municipios sin AGEB urbana, celda de su centroide | **propio**: la celda UTCI de su centroide |
 | MEDI | 7 componentes nativos | 6 nativos + calefacción estatal | 4 propios + 3 heredados + calefacción estatal |
@@ -114,6 +140,14 @@ Qué implica heredar:
 - Problema de la unidad de área modificable (MAUP): los cuantiles y las
   correlaciones cambian con el nivel. Las correlaciones de la gráfica de
   dispersión son ecológicas (entre unidades), no individuales.
+- La función de **dispersión** `plots.socio_scatter` (retirada del panel;
+  disponible para análisis) toma las horas UTCI de la celda del **centroide**
+  de cada municipio o estado, mientras que la necesidad climática del índice
+  pondera las celdas de sus localidades por población. Para un municipio
+  grande y heterogéneo las dos cifras pueden diferir.
+- Las **clases de la leyenda** son cuantiles nacionales fijos por nivel e
+  indicador (para AGEB, urbanas y rurales juntas): comparables entre
+  ciudades, pero no son umbrales de política ni de riesgo.
 
 ## 5. Censura, precisión y huecos
 
@@ -140,7 +174,10 @@ Qué implica heredar:
   ≤ 15 % ok, 15–30 % aviso, > 30 % poco preciso (borde rojo punteado en el
   mapa). AC es preciso en 99 % de los municipios; combustible ok en 60 %,
   aviso 29 %, poco preciso 11 %; chimenea 52 / 30 / 18 %. **Un municipio
-  pequeño con 20 % de leña y CV 40 % no debe citarse como "20 %"**.
+  pequeño con 20 % de leña y CV 40 % no debe citarse como "20 %"**. Los
+  estratos con una sola UPM en la muestra aportan varianza cero, así que el
+  CV está **subestimado** en los municipios más pequeños; INEGI publica sus
+  propias estadísticas de precisión si hace falta contrastar.
 - **Tres municipios sin datos del ampliado**: Seybaplaya (04012), Honduras de
   la Sierra (07125) y 29048 (Tlaxcala) vienen completos en "cobertura 3" del
   Censo (viviendas sin información de ocupantes). Quedan nulos con sus 19 AGEB.
@@ -154,24 +191,29 @@ Definida con la propia malla UTCI ([ADR-0007](adr/0007-regla-climatica-utci.md),
 - `h_calor` = horas/año en niveles ≥ 7 (calor fuerte o más, UTCI > 32 °C);
   `h_frio` = horas/año en niveles ≤ 3 (frío moderado o más, UTCI < 0 °C);
   promedio de los años catalogados (2022–2023).
-- **Necesita AC** si `h_calor ≥ 912`; **necesita calefacción** si `h_frio ≥ 625`.
+- **Necesita AC** si `h_calor ≥ 902`; **necesita calefacción** si `h_frio ≥ 626`
+  (valores con las AGEB rurales incluidas; con sólo urbanas eran 912 y 625:
+  la regla es estable).
   Umbrales calibrados para reproducir la evidencia externa a nivel estatal:
   regiones ENCEVI para AC (95.4 % de coincidencia ponderada por población;
   excepciones: Morelos, Nayarit y Colima, "templados" en ENCEVI pero
   calurosos) y estados con ≥ 8 % de viviendas con calefactor para frío
   (87.8 %). Se probó también < 9 °C: discrimina peor, porque el altiplano
   acumula horas frescas sin usar calefacción.
-- Resultado: 46 % de las AGEB necesitan AC, 10 % calefacción, 3 % ambas, 48 %
-  ninguna (tienen confort térmico = 0 por definición).
+- Resultado: 47.8 % de las AGEB necesitan AC, 10.7 % calefacción, 3.8 % ambas,
+  45.3 % ninguna (tienen confort térmico = 0 por definición).
 - `p_sin_confort` = `p_sin_ac` donde sólo se necesita AC; `p_sin_calef` donde
   sólo calefacción; media de ambas donde las dos; 0 donde ninguna.
 - **Limitación conocida**: Nuevo León, Coahuila y Tamaulipas usan calefactor
-  (18–29 % de viviendas) por frentes fríos cortos que no suman 625 h bajo
+  (18–29 % de viviendas) por frentes fríos cortos que no suman 626 h bajo
   cero; con esta regla no "necesitan" calefacción. Es una decisión abierta
   con el equipo: una regla por rachas o grados-hora la cambiaría (parámetros
   en la libreta 009).
 - La necesidad climática se mide con UTCI a 2 m de un reanálisis: no capta
   isla de calor urbana ni condiciones interiores.
+- Las horas se cuentan sobre las horas **válidas** de la celda; en celdas con
+  UTCI indefinido parte del año (sobre todo marinas), `h_calor` y `h_frio`
+  quedan subestimadas. En tierra el efecto es marginal.
 
 ## 7. El índice MEDI
 
@@ -188,9 +230,12 @@ Definida con la propia malla UTCI ([ADR-0007](adr/0007-regla-climatica-utci.md),
   para el ITER básico; sólo podría aproximarse por municipio con los
   microdatos del ampliado y quedó anotado como trabajo futuro.
 - **Resultados de cara** (2020): estados de 1.7 (CDMX) a 36.4 (Chiapas),
-  seguido de Oaxaca 34.4 y Guerrero 30.1; municipios de 0.4 a 66.3; AGEB
-  hasta 90. El aire acondicionado del Censo y el de la ENCEVI por estado
-  correlacionan 0.97.
+  seguido de Oaxaca 34.4 y Guerrero 30.1; municipios de 0.4 a 66.6; AGEB
+  hasta 95 (con rurales; 71 917 de 79 181 con índice). El aire acondicionado
+  del Censo y el de la ENCEVI por estado correlacionan 0.97.
+- **Pesos**: son los del archivo `descriptores_MEDI.xlsx` que entregó el
+  equipo (0.24, 0.21, 0.14, 0.13, 0.13, 0.08, 0.07). El atlas no tiene la
+  referencia metodológica que los justifica; hay que citarla desde el equipo.
 - **Sensibilidad a los pesos**: no evaluada; cambiar un peso es editar `W` en
   la libreta 010 y reejecutar 010 y 007 (ítem B13 del temario).
 
@@ -237,8 +282,31 @@ no describe cambios en las carencias, sólo en el clima.
   (`INDICATORS`); umbral de zoom y clases, `src/atlas/choropleth.py`.
 - Todas las decisiones no triviales tienen ADR en `docs/adr/` con evidencia y
   la señal que obligaría a revisarlas.
+- "Verificado" en este repositorio significa que la libreta tiene una
+  comprobación automática (`assert`) contra una cifra oficial o contra otra
+  fuente: población nacional, tabulados estatales, boletín del Censo,
+  regiones ENCEVI. Las tolerancias están escritas en cada libreta (p. ej.
+  0.5 puntos entre microdatos y tabulado estatal de leña).
 
-## 11. Preguntas frecuentes
+## 11. Cómo citar
+
+- **UTCI / ERA5-HEAT:** Di Napoli, C., Barnard, C., Prudhomme, C., Cloke, H. L.
+  y Pappenberger, F. (2021). *ERA5-HEAT: A global gridded historical dataset
+  of human thermal comfort indices from climate reanalysis*. Geoscience Data
+  Journal, 8(1), 2–10. Datos: Copernicus Climate Change Service (C3S), Climate
+  Data Store. Escala UTCI: Bröde, P. et al. (2012). *Deriving the operational
+  procedure for the Universal Thermal Climate Index (UTCI)*. Int. J.
+  Biometeorol., 56, 481–494.
+- **Censo 2020:** INEGI. *Censo de Población y Vivienda 2020*. Principales
+  resultados por AGEB y manzana urbana; Principales resultados por localidad
+  (ITER); Cuestionario ampliado, microdatos; Marco Geoestadístico 2020.
+- **ENCEVI 2018:** INEGI. *Encuesta Nacional sobre Consumo de Energéticos en
+  Viviendas Particulares 2018*.
+- **Este atlas:** citar el repositorio con el commit (p. ej. `f147343`) y el
+  ADR que sustente la cifra usada; las cifras derivadas (MEDI, regla
+  climática) son procesamiento propio, no de INEGI ni de Copernicus.
+
+## 12. Preguntas frecuentes
 
 - **¿Por qué el MEDI por AGEB tiene bloques del tamaño de un municipio?**
   Porque tres componentes son heredados (§4). Mira los componentes propios
@@ -270,7 +338,7 @@ no describe cambios en las carencias, sólo en el clima.
   Uso) y Copernicus (licencia ERA5) lo permiten con cita. Cita las fuentes
   primarias y el atlas como procesamiento; los ADR documentan cada decisión.
 
-## 12. Qué no hacer con estas capas
+## 13. Qué no hacer con estas capas
 
 - No interpretar un valor heredado como medición de la AGEB.
 - No citar tasas del ampliado sin su CV, ni las "poco precisas" como puntuales.
@@ -278,8 +346,9 @@ no describe cambios en las carencias, sólo en el clima.
 - No comparar el MEDI de 2020 con un UTCI futuro como si midiera cambio social.
 - No tratar el MEDI como conteo de hogares pobres ni sumar pesos parciales.
 - No usar la necesidad climática como medida de confort interior.
+- No leer las clases de cuantiles como umbrales de riesgo o de política.
 
-## 13. Decisiones pendientes del equipo
+## 14. Decisiones pendientes del equipo
 
 1. Confirmar que el MEDI es suma ponderada de tasas (ADR-0006) o pedir la
    versión Alkire-Foster municipal con microdatos del ampliado.
@@ -289,3 +358,5 @@ no describe cambios en las carencias, sólo en el clima.
    vista nacional por defecto.
 5. ~~Las 331 AGEB mixtas~~ — decidido: conservan su fila urbana sin sumar
    localidades rurales (plan 05).
+6. Confirmar las siglas del MEDI y la referencia metodológica de sus pesos
+   para poder citarlos.

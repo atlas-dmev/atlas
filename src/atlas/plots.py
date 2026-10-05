@@ -63,8 +63,13 @@ def year_medi_default() -> int:
 def socio_scatter(year: int, level: int, medi_year: int, ind: dict, nivel: str, nivel_label: str) -> plt.Figure:
     """Dispersión: horas/año en el nivel UTCI (celda del centroide) vs indicador MEDI.
 
-    Cada punto es un municipio o estado; el área es proporcional a la
-    población. Se reporta la correlación de Spearman (monótona, robusta).
+    Herramienta de **análisis** (libretas, informes), no de la app: se retiró
+    del panel derecho el 2026-09-02 porque en 320 px era ilegible y no
+    reaccionaba al clic; la capa bivariada (PLAN-VISIBILIDAD, V5) cubre el
+    cruce en el mapa. Cada punto es un municipio o estado; el área es
+    proporcional a la población. La correlación de Spearman es **ecológica**
+    (entre unidades, no entre hogares) y las horas son las de la celda del
+    centroide, no ponderadas por población.
     """
     u = _hours_by_unit(year, level, nivel)
     col = ind["column"]

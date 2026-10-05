@@ -286,7 +286,7 @@ leen los xlsx desde libretas.
   y 2.37 %; desierto de Sonora (30.50, −113.00): sin AGEB, mensaje explícito.
   Respuesta ~1.5 s incluyendo el histograma.
 - [x] **S8 — Documentación y cierre.** README (pipeline, catálogo,
-  arquitectura, estructura). Nuevo `docs/DATOS-INEGI.md` (metodología de
+  arquitectura, estructura). Nuevo `docs/DATOS.md` (metodología de
   datos: fuentes, reglas, cruce con el UTCI, limitaciones). Cinco ADR con
   evidencia en `docs/adr/` (fuente y denominador, asteriscos, CRS, GeoParquet +
   STAC table, AGEB por ventana). Temario por ítems ampliado con C5, A11, A12,

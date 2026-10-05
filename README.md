@@ -13,7 +13,7 @@ un **año** (descubierto en el catálogo STAC), pinta el mapa nacional de
 distribución de horas por nivel de esa celda. El panel derecho superpone
 **indicadores socioeconómicos del Censo 2020** (INEGI: los siete componentes
 del índice MEDI de carencia energética y el índice mismo) por estado, municipio
-o AGEB urbana, con una dispersión horas UTCI vs indicador, y el clic
+o AGEB urbana, y el clic
 resume además esas carencias para las AGEB de la celda (cruce UTCI × INEGI).
 
 ![Campo de UTCI máximo diario sobre México](docs/preview.png)
@@ -93,7 +93,7 @@ municipio, estado y localidad ≥ 50 k, con coeficiente de variación: combustib
 distinto de gas/electricidad (0.13), fogón sin chimenea (0.13) y aire
 acondicionado. Confort térmico (0.14) condicional al clima definido con la
 propia malla UTCI (ADR-0007); calefacción de ENCEVI 2018. Ver
-[docs/DATOS-INEGI.md](docs/DATOS-INEGI.md).
+[docs/DATOS.md](docs/DATOS.md).
 Los asteriscos de INEGI (indicador con menos de 3 unidades) se guardan como
 nulos con banderas; electricidad lleva además una cota superior.
 
@@ -167,7 +167,7 @@ notebooks/       pipeline reproducible (001 concatenar, 002 niveles, 003 STAC,
                  004 marco INEGI, 005 MEDI AGEB, 006 MEDI municipal, 011 AGEB rurales,
                  008 ampliado, 009 regla climática, 010 índice MEDI, 007 STAC inegi)
 docs/            metodología, temarios, SUPOSICIONES.md (guía para el equipo: supuestos,
-                 escalas, límites), DATOS-INEGI.md (datos del Censo), adr/ (decisiones)
+                 escalas, límites), DATOS.md (datos: UTCI, Censo, ENCEVI, productos), adr/ (decisiones)
                  y planes/ (planes ejecutados: 01 visor v1, 02 UTCI→STAC, 03 capas INEGI)
 data/            datos (fuera de Git): raw/, derived/, stac/
 ```

@@ -265,19 +265,6 @@ def socio_server(input, base_map, clic=None):
             style="margin-top:10px;",
         )
 
-    @render.plot
-    def socio_dispersion():
-        """Horas/año en el nivel UTCI elegido vs indicador socioeconómico, por municipio o estado."""
-        info = indicador_actual()
-        if info is None or not input.socio_on():
-            return plots.placeholder("Capa socioeconómica apagada")
-        nivel = nivel_datos()
-        if nivel == "ageb":
-            nivel = "mun"
-        return plots.socio_scatter(
-            int(input.anio()), LEVELS[input.nivel()], int(input.socio_anio()), info, nivel, input.nivel()
-        )
-
     @render.ui
     def socio_escala():
         """De dónde viene el dato en el nivel mostrado (nativo o heredado)."""

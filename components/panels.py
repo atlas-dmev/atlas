@@ -93,7 +93,6 @@ def socio_panel(indicators, years):
         ui.output_ui("socio_leyenda"),
         ui.output_ui("socio_hover"),
         ui.output_ui("socio_escala"),
-        ui.output_plot("socio_dispersion", height="230px"),
         ui.tags.p(
             "Estado y municipio: totales del Censo 2020 (urbano + rural). AGEB: urbanas "
             "(ITER) y rurales (suma de sus localidades; trazo punteado y menos opacidad), "
